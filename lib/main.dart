@@ -1,8 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void main() {
   runApp(MyApp());
 }
+
+String _name = 'Tobe';
 
 class MyApp extends StatelessWidget {
   @override
@@ -42,12 +45,47 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: Text('Friendly Chat'),
       ),
-      body: Row(
+      body: Column(
         children: [
-          Expanded(child: _buildTextComposer()),
-          IconButton(onPressed: () {}, icon: Icon(Icons.send))
+          ChatMessage('hello'),
+          Row(
+            children: [
+              Expanded(child: _buildTextComposer()),
+              IconButton(onPressed: () {}, icon: Icon(Icons.send))
+            ],
+          ),
         ],
       ),
     );
+  }
+}
+
+class ChatMessage extends StatelessWidget {
+  ChatMessage(this.text);
+  final String text;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(right: 16),
+          child: CircleAvatar(
+            child: Text(_name[0].toUpperCase()),
+          ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _name,
+              style: Theme.of(context).textTheme.headline5,
+            ),
+            Container(margin: EdgeInsets.only(top: 5), child: Text(text))
+          ],
+        )
+      ],
+    ));
   }
 }
