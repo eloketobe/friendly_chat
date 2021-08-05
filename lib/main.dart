@@ -27,10 +27,16 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   List<ChatMessage> _messages = [];
+  bool _isComposing = false;
   final _textController = TextEditingController();
   final _focusNode = FocusNode();
   void _handleSubmitted(String text) {
     _textController.clear();
+
+    setState(() {
+      _isComposing = false;
+    });
+
     ChatMessage message = ChatMessage(
       text: text,
       animationController: AnimationController(
@@ -46,9 +52,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   Widget _buildTextComposer() => Container(
         margin: EdgeInsets.symmetric(horizontal: 8),
         child: TextField(
+          onChanged: (value) {
+            setState(() {
+              _isComposing = value.isNotEmpty;
+            });
+          },
           focusNode: _focusNode,
           controller: _textController,
-          onSubmitted: _handleSubmitted,
+          onSubmitted: _isComposing ? _handleSubmitted : null,
           decoration: InputDecoration.collapsed(hintText: 'Send  Message'),
         ),
       );
@@ -76,7 +87,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               children: [
                 Expanded(child: _buildTextComposer()),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: _isComposing
+                      ? () => _handleSubmitted(_textController.text)
+                      : null,
                   icon: Icon(Icons.send),
                   color: Theme.of(context).accentColor,
                 )
@@ -116,15 +129,17 @@ class ChatMessage extends StatelessWidget {
               child: Text(_name[0].toUpperCase()),
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _name,
-                style: Theme.of(context).textTheme.headline5,
-              ),
-              Container(margin: EdgeInsets.only(top: 5), child: Text(text))
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _name,
+                  style: Theme.of(context).textTheme.headline5,
+                ),
+                Container(margin: EdgeInsets.only(top: 5), child: Text(text))
+              ],
+            ),
           )
         ],
       )),
