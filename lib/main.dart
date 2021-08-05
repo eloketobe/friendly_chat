@@ -26,14 +26,21 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  List<ChatMessage> _messages = [];
   final _textController = TextEditingController();
+  final _focusNode = FocusNode();
   void _handleSubmitted(String text) {
     _textController.clear();
+    setState(() {
+      _messages.insert(0, ChatMessage(text));
+    });
+    _focusNode.requestFocus();
   }
 
   Widget _buildTextComposer() => Container(
         margin: EdgeInsets.symmetric(horizontal: 8),
         child: TextField(
+          focusNode: _focusNode,
           controller: _textController,
           onSubmitted: _handleSubmitted,
           decoration: InputDecoration.collapsed(hintText: 'Send  Message'),
@@ -47,12 +54,28 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Column(
         children: [
-          ChatMessage('hello'),
-          Row(
-            children: [
-              Expanded(child: _buildTextComposer()),
-              IconButton(onPressed: () {}, icon: Icon(Icons.send))
-            ],
+          Flexible(
+              child: ListView.builder(
+            padding: EdgeInsets.all(8),
+            reverse: true,
+            itemBuilder: (_, index) => _messages[index],
+            itemCount: _messages.length,
+          )),
+          Divider(
+            height: 10,
+          ),
+          Container(
+            decoration: BoxDecoration(color: Theme.of(context).cardColor),
+            child: Row(
+              children: [
+                Expanded(child: _buildTextComposer()),
+                IconButton(
+                  onPressed: () {},
+                  icon: Icon(Icons.send),
+                  color: Theme.of(context).accentColor,
+                )
+              ],
+            ),
           ),
         ],
       ),
